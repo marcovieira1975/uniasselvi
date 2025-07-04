@@ -1,22 +1,201 @@
-!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Cadastro de Clientes</title>
+  <meta charset="UTF-8">
+  <title>Cadastro de Produto</title>
+  <style>
+    body {
+      background: #f1f8e9;
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      text-align: center;
+    }
+    .form-box, .table-box {
+      background: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      display: inline-block;
+      box-shadow: 0 0 10px #aed581;
+      margin-bottom: 30px;
+    }
+    input {
+      margin: 10px 0;
+      padding: 10px;
+      width: 250px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #7cb342;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      margin-top: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    table {
+      margin-top: 20px;
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+    }
+    .actions button {
+      margin: 0 4px;
+      background-color: #f57c00;
+    }
+    .actions button.delete {
+      background-color: #e53935;
+    }
+  </style>
 </head>
 <body>
-    <h2>Cadastro de Clientes</h2>
-    <form method="POST" action="salvar_cliente.php">
-        <label>Nome:</label><br>
-        <input type="text" name="nome" required><br><br>
-
-        <label>Email:</label><br>
-        <input type="email" name="email" required><br><br>
-
-        <label>Telefone:</label><br>
-        <input type="text" name="telefone"><br><br>
-
-        <input type="submit" value="Cadastrar">
+  <div class="form-box">
+    <h2>Cadastrar Produto no Estoque</h2>
+    <form id="formProduto">
+      <input type="text" name="nome" placeholder="Nome do Produto" required><br>
+      <input type="text" name="categoria" placeholder="Categoria" required><br>
+      <input type="number" name="preco" step="0.01" placeholder="Preço" required><br>
+      <input type="number" name="quantidade" placeholder="Quantidade" required><br>
+      <button type="submit">Salvar Produto</button>
     </form>
+  </div>
+
+  <div class="table-box">
+    <h3>Produtos Cadastrados</h3>
+    <table id="tabelaProdutos">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Categoria</th>
+          <th>Preço</th>
+          <th>Quantidade</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+       
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    document.getElementById("formProduto").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const form = event.target;
+      const produto = {
+        nome: form.nome.value,
+        categoria: form.categoria.value,
+        preco: parseFloat(form.preco.value),
+        quantidade: parseInt(form.quantidade.value)
+      };
+
+      fetch("/produtos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(produto)
+      })
+      .then(res => res.json())
+      .then(() => {
+        alert("Produto cadastrado!");
+        form.reset();
+        carregarProdutos();
+      })
+      .catch(err => {
+        console.error("Erro:", err);
+        alert("Erro ao cadastrar produto.");
+      });
+    });
+
+    function carregarProdutos() {
+  fetch("/produtos")
+    .then(res => res.json())
+    .then(produtos => {
+      const tbody = document.querySelector("#tabelaProdutos tbody");
+      tbody.innerHTML = "";
+
+      produtos.forEach(p => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td><input type="text" id="nome-${p.id_produto}" value="${p.nome}"></td>
+          <td><input type="text" id="categoria-${p.id_produto}" value="${p.categoria}"></td>
+          <td><input type="number" step="0.01" id="preco-${p.id_produto}" value="${p.preco}"></td>
+          <td><input type="number" id="quantidade-${p.id_produto}" value="${p.quantidade}"></td>
+          <td class="actions">
+            <button onclick="salvarAlteracoes(${p.id_produto})">Salvar</button>
+            <button class="delete" onclick="deletarProduto(${p.id_produto})">Excluir</button>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    });
+}
+
+    function salvarAlteracoes(id) {
+  const nome = document.getElementById(nome-${id}).value;
+  const categoria = document.getElementById(categoria-${id}).value;
+  const preco = parseFloat(document.getElementById(preco-${id}).value);
+  const quantidade = parseInt(document.getElementById(quantidade-${id}).value);
+
+  fetch(/produtos/${id}, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ nome, categoria, preco, quantidade })
+  })
+  .then(res => res.json())
+  .then(() => {
+    alert("Produto atualizado com sucesso!");
+    carregarProdutos();
+  })
+  .catch(err => {
+    console.error("Erro ao atualizar produto:", err);
+    alert("Erro ao atualizar produto.");
+  });
+}
+
+
+
+    function atualizarCampo(id, campo, valor) {
+      fetch(/produtos/${id}, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ [campo]: campo === 'preco' || campo === 'quantidade' ? Number(valor) : valor })
+      })
+      .then(res => res.json())
+      .then(() => {
+        console.log("Produto atualizado.");
+      })
+      .catch(err => {
+        console.error("Erro ao atualizar:", err);
+        alert("Erro ao atualizar produto.");
+      });
+    }
+
+    function deletarProduto(id) {
+      if (!confirm("Tem certeza que deseja excluir?")) return;
+
+      fetch(/produtos/${id}, {
+        method: "DELETE"
+      })
+      .then(res => res.json())
+      .then(() => {
+        alert("Produto excluído!");
+        carregarProdutos();
+      })
+      .catch(err => {
+        console.error("Erro ao excluir:", err);
+        alert("Erro ao excluir produto.");
+      });
+    }
+
+ 
+    window.onload = carregarProdutos;
+  </script>
 </body>
 </html>
