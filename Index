@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Hortifruti FLV</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #e8f5e9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 400px;
+    }
+
+    .card h1 {
+      color: #4CAF50;
+      font-size: 32px;
+      margin: 10px 0;
+    }
+
+    .card h2 {
+      color: #4CAF50;
+      margin-top: 5px;
+      font-size: 24px;
+    }
+
+    .subtitle {
+      color: #2e7d32;
+      margin: 15px 0;
+    }
+
+    .btn-container {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 25px;
+    }
+
+    .btn {
+      padding: 12px 18px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 16px;
+      color: white;
+      cursor: pointer;
+      background-color: #8bc34a;
+      transition: background 0.3s ease;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background-color: #689f38;
+    }
+
+    .frutas {
+      font-size: 32px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="frutas">🍎🍊🍇</div>
+    <h1>Hortifruti</h1>
+    <h2>🥦🥕🍓</h2>
+    <p class="subtitle">Seu estoque sempre em dia com a natureza!</p>
+    <h3><strong>Bem-vindo(a)!</strong></h3>
+    <p>Por favor, escolha uma opção para continuar:</p>
+
+    <div class="btn-container">
+      <a class="btn" href="/cadastro_usuario">Cadastrar Usuarios</a>
+      <a class="btn" href="/cadastro_produto">Cadastrar Produtos</a>
+    </div>
+  </div>
+</body>
+</html>
