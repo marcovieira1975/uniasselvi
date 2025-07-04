@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastro de Usuário</title>
+  <style>
+    body {
+      background: #f1f8e9;
+      font-family: Arial, sans-serif;
+      padding: 50px;
+      text-align: center;
+    }
+    .form-box {
+      background: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      display: inline-block;
+      box-shadow: 0 0 10px #c5e1a5;
+    }
+    input {
+      margin: 10px 0;
+      padding: 10px;
+      width: 250px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #66bb6a;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      margin-top: 15px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-box">
+    <h2>Cadastrar Novo Usuário</h2>
+    <form id="formUsuario">
+      <input type="text" name="nome" placeholder="Nome" required><br>
+      <input type="email" name="email" placeholder="Email" required><br>
+      <input type="password" name="senha" placeholder="Senha" required><br>
+      <button type="submit">Salvar</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("formUsuario").addEventListener("submit", function(event) {
+      event.preventDefault(); 
+
+      const form = event.target;
+      const nome = form.nome.value;
+      const email = form.email.value;
+      const senha = form.senha.value;
+
+      fetch("http://localhost:5000/usuarios", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ nome, email, senha })
+      })
+      .then(response => response.json())
+      .then(data => {
+        alert("Usuário cadastrado com sucesso!");
+        console.log(data);
+        form.reset(); 
+      })
+      .catch(error => {
+        console.error("Erro ao cadastrar:", error);
+        alert("Erro ao cadastrar usuário.");
+      });
+    });
+  </script>
+</body>
+</html>
