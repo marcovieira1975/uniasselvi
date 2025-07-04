@@ -1,0 +1,149 @@
+from flask import Flask, request, jsonify, render_template
+import psycopg2
+from flask_cors import CORS
+
+app = Flask(_name_)
+CORS(app)
+
+conn = psycopg2.connect(
+    host="localhost",
+    database="hortifruti",
+    user="postgres",
+    password="12345",
+    port=5432,
+    options='-c client_encoding=UTF8'
+)
+cursor = conn.cursor()
+
+@app.route("/")
+def home():
+    return render_template("index.html")
+
+@app.route("/cadastro_usuario")
+def cadastro_usuario():
+    return render_template("cadastro_usuario.html")
+
+@app.route("/cadastro_produto")
+def cadastro_produto():
+    return render_template("cadastro_produto.html")
+
+@app.route("/listar_usuarios")
+def pagina_listar_usuarios():
+    return render_template("listar_usuarios.html")
+
+@app.route("/listar_produtos")
+def pagina_listar_produtos():
+    return render_template("listar_produtos.html")
+
+
+
+
+@app.route("/usuarios", methods=["GET"])
+def listar_usuarios():
+    try:
+        cursor.execute("SELECT id_usuario, nome, email FROM Usuario")
+        dados = cursor.fetchall()
+        return jsonify([
+            {"id_usuario": x[0], "nome": x[1], "email": x[2]} for x in dados
+        ])
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"erro": str(e)}), 500
+
+@app.route("/usuarios", methods=["POST"])
+def adicionar_usuario():
+    try:
+        data = request.json
+        cursor.execute(
+            "INSERT INTO Usuario (nome, email, senha) VALUES (%s, %s, %s)",
+            (data["nome"], data["email"], data["senha"])
+        )
+        conn.commit()
+        return jsonify({"status": "usuario_adicionado"})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"erro": str(e)}), 500
+
+@app.route("/usuarios/<int:id_usuario>", methods=["PUT"])
+def editar_usuario(id_usuario):
+    try:
+        data = request.json
+        cursor.execute(
+            "UPDATE Usuario SET nome = %s, email = %s, senha = %s WHERE id_usuario = %s",
+            (data["nome"], data["email"], data["senha"], id_usuario)
+        )
+        conn.commit()
+        return jsonify({"status": "usuario_atualizado"})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"erro": str(e)}), 500
+
+@app.route("/usuarios/<int:id_usuario>", methods=["DELETE"])
+def remover_usuario(id_usuario):
+    try:
+        cursor.execute("DELETE FROM Usuario WHERE id_usuario = %s", (id_usuario,))
+        conn.commit()
+        return jsonify({"status": "usuario_removido"})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"erro": str(e)}), 500
+
+
+@app.route("/produtos", methods=["GET"])
+def listar_produtos():
+    try:
+        cursor.execute("SELECT id_produto, nome, categoria, preco, quantidade FROM Produto")
+        produtos = cursor.fetchall()
+        return jsonify([
+            {
+                "id_produto": p[0],
+                "nome": p[1],
+                "categoria": p[2],
+                "preco": float(p[3]),
+                "quantidade": p[4]
+            } for p in produtos
+        ])
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"erro": str(e)}), 500
+
+@app.route("/produtos", methods=["POST"])
+def adicionar_produto():
+    try:
+        data = request.json
+        cursor.execute(
+            "INSERT INTO Produto (nome, categoria, preco, quantidade) VALUES (%s, %s, %s, %s)",
+            (data["nome"], data["categoria"], data["preco"], data["quantidade"])
+        )
+        conn.commit()
+        return jsonify({"status": "produto_adicionado"})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"erro": str(e)}), 500
+
+@app.route("/produtos/<int:id_produto>", methods=["PUT"])
+def editar_produto(id_produto):
+    try:
+        data = request.json
+        cursor.execute(
+            "UPDATE Produto SET nome = %s, categoria = %s, preco = %s, quantidade = %s WHERE id_produto = %s",
+            (data["nome"], data["categoria"], data["preco"], data["quantidade"], id_produto)
+        )
+        conn.commit()
+        return jsonify({"status": "produto_atualizado"})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"erro": str(e)}), 500
+
+@app.route("/produtos/<int:id_produto>", methods=["DELETE"])
+def remover_produto(id_produto):
+    try:
+        cursor.execute("DELETE FROM Produto WHERE id_produto = %s", (id_produto,))
+        conn.commit()
+        return jsonify({"status": "produto_removido"})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"erro": str(e)}), 500
+
+if _name_ == "_main_":
+    app.run(debug=True)
